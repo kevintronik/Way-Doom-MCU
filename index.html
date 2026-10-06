@@ -50,26 +50,25 @@
         }
 
         /* Marca de agua central redonda */
-        .watermark-bg {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.08;
-            user-select: none;
-        }
-
-        .watermark-bg img {
-            width: clamp(260px, 35vw, 440px);
-            height: clamp(260px, 35vw, 440px);
-            border-radius: 9999px;
-            object-fit: cover;
-            filter: grayscale(100%);
-        }
+       .watermark-bg {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.16;
+    user-select: none;
+}
+.watermark-bg img {
+    width: clamp(260px, 35vw, 440px);
+    height: clamp(260px, 35vw, 440px);
+    border-radius: 9999px;
+    object-fit: cover;
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.8));
+}
 
         /* Estilos del Portal Doctor Strange */
         #strange-portal-wrap:hover .portal-glow-ring {
@@ -150,21 +149,23 @@
 
     <canvas id="space-canvas"></canvas>
 
-    <!-- Marca de agua central (Logo redondo) -->
-    <div class="watermark-bg">
-        <img src="https://raw.githubusercontent.com/kevintronik/Way-Doom-MCU/main/images/Logo_kevintronik.jpg" alt="Watermark Logo" onerror="this.onerror=null; this.src='images/Logo_kevintronik.jpg'">
-        <span class="text-4xl sm:text-6xl font-black font-orbitron tracking-widest uppercase mt-4 text-white">kevintronik</span>
-    </div>
+<!-- Marca de agua central -->
+<div class="watermark-bg">
+    <img src="https://raw.githubusercontent.com/kevintronik/Way-Doom-MCU/refs/heads/main/images/Logo_kevintronik.jpg" 
+         alt="Watermark Logo" 
+         onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/kevintronik/Way-Doom-MCU@main/images/Logo_kevintronik.jpg'; this.onerror=()=>this.src='images/Logo_kevintronik.jpg';">
+    <span class="text-4xl sm:text-6xl font-black font-orbitron tracking-widest uppercase mt-4 text-white">kevintronik</span>
+</div>
 
     <!-- Marca de agua abajo a la izquierda: Portal Real Doctor Strange -->
     <div id="strange-portal-wrap" class="fixed bottom-5 left-5 z-50 flex items-center gap-3 select-none cursor-pointer group" title="kevintronik">
-        <!-- Sling Ring Circular Portal -->
-        <div id="portal-logo-trigger" class="relative w-14 h-14 flex items-center justify-center shrink-0">
-            <canvas id="strange-portal-canvas" width="220" height="220" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; pointer-events: none; z-index: 30;"></canvas>
-            <div id="portal-logo-disc" class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 relative z-10 transition-all duration-300 group-hover:scale-105 group-hover:border-amber-400 group-hover:shadow-[0_0_20px_rgba(255,183,3,0.85)] bg-slate-900">
-                <img src="https://raw.githubusercontent.com/kevintronik/Way-Doom-MCU/main/images/Logo_kevintronik.jpg" alt="kevintronik logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='images/Logo_kevintronik.jpg'">
-            </div>
-        </div>
+  <!-- Logo del Portal Sling Ring (abajo izquierda) -->
+<div id="portal-logo-disc" class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 relative z-10 transition-all duration-300 group-hover:scale-105 group-hover:border-amber-400 group-hover:shadow-[0_0_20px_rgba(255,183,3,0.85)] bg-slate-900">
+    <img src="https://raw.githubusercontent.com/kevintronik/Way-Doom-MCU/refs/heads/main/images/Logo_kevintronik.jpg" 
+         alt="kevintronik logo" 
+         class="w-full h-full object-cover" 
+         onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/kevintronik/Way-Doom-MCU@main/images/Logo_kevintronik.jpg'; this.onerror=()=>this.src='images/Logo_kevintronik.jpg';">
+</div>
         <!-- Texto limpio kevintronik -->
         <div class="bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 group-hover:border-tva-gold/60 transition-all shadow-lg">
             <span class="text-xs font-orbitron font-bold tracking-widest text-slate-100 group-hover:text-tva-gold transition-colors block">kevintronik</span>
