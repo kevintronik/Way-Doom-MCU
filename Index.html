@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>MCU Chronological Timeline & Checklist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tva-gold': '#ffb703',
+                        'tva-orange': '#fb8500',
+                        'cosmic-purple': '#7209b7',
+                        'cosmic-blue': '#4361ee',
+                        'neon-cyan': '#4cc9f0',
+                        'space-dark': '#070913',
+                        'space-card': 'rgba(15, 23, 42, 0.78)'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #05070f;
+            color: #e2e8f0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #space-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Marca de agua central redonda */
+        .watermark-bg {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.04;
+            user-select: none;
+        }
+
+        .watermark-bg img {
+            width: clamp(260px, 35vw, 440px);
+            height: clamp(260px, 35vw, 440px);
+            border-radius: 9999px;
+            object-fit: cover;
+            filter: grayscale(100%);
+        }
+
+        /* Estilos del Portal Doctor Strange */
+        #strange-portal-wrap:hover .portal-glow-ring {
+            box-shadow: 0 0 25px #fb8500, 0 0 50px rgba(255, 183, 3, 0.7);
+        }
+
+        .glow-gold {
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.7), 0 0 20px rgba(255, 183, 3, 0.4);
+        }
+        .glow-cyan {
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.7), 0 0 20px rgba(76, 201, 240, 0.4);
+        }
+        .glow-box-gold {
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+        }
+        .glow-box-purple {
+            box-shadow: 0 0 20px rgba(114, 9, 183, 0.4);
+        }
+
+        /* Línea Troncal Sagrada */
+        .timeline-line {
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #4cc9f0 0%, #ffb703 50%, #7209b7 100%);
+            box-shadow: 0 0 12px #4cc9f0, 0 0 20px #ffb703;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .timeline-line {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Tarjeta de Producción MCU */
+        .mcu-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mcu-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(255, 183, 3, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(255, 183, 3, 0.25), 0 0 15px rgba(76, 201, 240, 0.2);
+        }
+
+        .mcu-card.watched {
+            border-color: rgba(255, 183, 3, 0.8);
+            background: rgba(15, 23, 42, 0.92);
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.25);
+        }
+        .mcu-card.watched .card-title {
+            color: #ffb703;
+            text-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+            border: 1px solid #4cc9f0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4cc9f0;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative selection:bg-tva-gold selection:text-black">
+
+    <canvas id="space-canvas"></canvas>
+
+    <!-- Marca de agua central (Logo redondo) -->
+    <div class="watermark-bg">
+        <img src="images/Logo_kevintronik.jpg" alt="Watermark Logo">
+        <span class="text-4xl sm:text-6xl font-black font-orbitron tracking-widest uppercase mt-4 text-white">kevintronik</span>
+    </div>
+
+    <!-- Marca de agua abajo a la izquierda: Portal Real Doctor Strange -->
+    <div id="strange-portal-wrap" class="fixed bottom-5 left-5 z-50 flex items-center gap-3 select-none cursor-pointer group" title="kevintronik">
+        <!-- Sling Ring Circular Portal -->
+        <div id="portal-logo-trigger" class="relative w-14 h-14 flex items-center justify-center shrink-0">
+            <canvas id="strange-portal-canvas" width="220" height="220" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; pointer-events: none; z-index: 30;"></canvas>
+            <div id="portal-logo-disc" class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 relative z-10 transition-all duration-300 group-hover:scale-105 group-hover:border-amber-400 group-hover:shadow-[0_0_20px_rgba(255,183,3,0.85)] bg-slate-900">
+                <img src="images/Logo_kevintronik.jpg" alt="kevintronik logo" class="w-full h-full object-cover">
+            </div>
+        </div>
+        <!-- Texto limpio kevintronik -->
+        <div class="bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 group-hover:border-tva-gold/60 transition-all shadow-lg">
+            <span class="text-xs font-orbitron font-bold tracking-widest text-slate-100 group-hover:text-tva-gold transition-colors block">kevintronik</span>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-8">
+
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-tva-gold/40 bg-black/50 backdrop-blur-md mb-4 text-tva-gold text-xs sm:text-sm font-orbitron tracking-widest uppercase glow-box-gold">
+                <i class="fa-solid fa-code-branch animate-pulse"></i> Agencia de Variación Temporal (TVA)
+            </div>
+            <h1 class="font-orbitron text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-yellow-400 to-purple-500 tracking-wider mb-2 glow-cyan">
+                LÍNEA TEMPORAL MCU
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+                Checklist cronológico del Universo Cinematográfico de Marvel. Visualiza las películas y series según su posición en la Sagrada Línea del Tiempo y el Multiverso.
+            </p>
+        </header>
+
+        <section class="bg-space-card border border-white/10 rounded-2xl p-4 sm:p-6 mb-12 backdrop-blur-md glow-box-purple">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                
+                <div class="space-y-1">
+                    <div class="text-xs font-orbitron uppercase text-slate-400">Progreso Temporal</div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="watched-count" class="text-3xl font-orbitron font-bold text-tva-gold glow-gold">0</span>
+                        <span class="text-slate-400 text-sm">/ <span id="total-count">0</span> producciones</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 md:col-span-1">
+                    <div class="flex justify-between text-xs font-orbitron">
+                        <span class="text-cyan-400">Estabilidad de la Línea</span>
+                        <span id="progress-percent" class="text-tva-gold">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-3 border border-cyan-500/30 overflow-hidden p-0.5">
+                        <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 via-tva-gold to-tva-orange h-full rounded-full transition-all duration-500 ease-out w-0 shadow-[0_0_10px_#4cc9f0]"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 flex-wrap">
+                    <button id="btn-export" onclick="exportProgress()" class="px-2.5 py-1.5 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 text-xs font-orbitron transition-all flex items-center gap-1.5" title="Exportar progreso a archivo JSON">
+                        <i class="fa-solid fa-file-export"></i> Exportar
+                    </button>
+                    <label class="px-2.5 py-1.5 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 text-xs font-orbitron transition-all flex items-center gap-1.5 cursor-pointer" title="Importar progreso desde JSON">
+                        <i class="fa-solid fa-file-import"></i> Importar
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importProgress(event)">
+                    </label>
+                    <button id="btn-reset" class="px-2.5 py-1.5 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 text-xs font-orbitron transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Reiniciar
+                    </button>
+                    <button id="btn-select-all" class="px-2.5 py-1.5 rounded-lg border border-tva-gold/40 text-tva-gold hover:bg-tva-gold/10 text-xs font-orbitron transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-check-double"></i> Marcar Todo
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-white/10 flex flex-col lg:flex-row gap-4 lg:items-center justify-between">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-orbitron text-slate-400 uppercase">Filtro:</span>
+                    <div class="flex flex-wrap gap-1.5" id="filter-buttons"></div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex bg-slate-900/90 p-0.5 rounded-lg border border-slate-700/60" id="type-filter">
+                        <button onclick="setTypeFilter('all')" id="type-all" class="px-2.5 py-1 text-xs font-orbitron rounded-md transition-all bg-tva-gold text-black font-semibold">Todos</button>
+                        <button onclick="setTypeFilter('movie')" id="type-movie" class="px-2.5 py-1 text-xs font-orbitron rounded-md transition-all text-slate-300 hover:text-white">Películas</button>
+                        <button onclick="setTypeFilter('series')" id="type-series" class="px-2.5 py-1 text-xs font-orbitron rounded-md transition-all text-slate-300 hover:text-white">Series</button>
+                    </div>
+
+                    <button onclick="toggleSort()" id="btn-sort" class="px-3 py-1.5 rounded-lg border border-cyan-500/50 bg-slate-900/90 text-cyan-300 hover:bg-cyan-500/10 text-xs font-orbitron transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> <span id="sort-label">Orden: Cronológico</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <main class="relative min-h-[400px]">
+            <div class="timeline-line"></div>
+            <div id="timeline-container" class="space-y-8 sm:space-y-12 relative z-20"></div>
+        </main>
+
+        <footer class="mt-20 text-center text-xs text-slate-500 font-orbitron py-6 border-t border-white/5">
+            <p>AVT Terminal - Registro de Variantes Multiversales - MCU Cronología | kevintronik</p>
+        </footer>
+
+    </div>
+
+    <!-- Modal de Detalles y Tráiler -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-space-card border border-cyan-500/40 rounded-2xl max-w-lg w-full p-6 relative shadow-[0_0_30px_rgba(76,201,240,0.3)]" onclick="event.stopPropagation()">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg w-8 h-8 rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-content" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const mcuData = [
+        {
+                "id": "mcu-1",
+                "title": "Capitán América: El Primer Vengador",
+                "year": 2011,
+                "timelineYear": "1942-1945",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNzUyM2YyY2MtNzNlMS00MWU5LTgxNjAtNzZlNmI2NjU2NDZlXkEyXkFqcGc@._V1_QL75_UY562_CR8,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-2",
+                "title": "Agente Carter (Temporadas 1-2)",
+                "year": 2015,
+                "timelineYear": "1946-1947",
+                "type": "series",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMzk0MzkxODMwOV5BMl5BanBnXkFtZTgwMjQzODE4NzE@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-3",
+                "title": "Capitana Marvel",
+                "year": 2019,
+                "timelineYear": "1995",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZDI1NGU2ODAtNzBiNy00MWY5LWIyMGEtZjUxZjUwZmZiNjBlXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-4",
+                "title": "Iron Man",
+                "year": 2008,
+                "timelineYear": "2010",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-5",
+                "title": "Iron Man 2",
+                "year": 2010,
+                "timelineYear": "2011",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYWYyOGQzOGYtMGQ1My00ZWYxLTgzZjktZWYzN2IwYjkxYzM0XkEyXkFqcGc@._V1_QL75_UY562_CR1,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-6",
+                "title": "El Increíble Hulk",
+                "year": 2008,
+                "timelineYear": "2011",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMTUyNzk3MjA1OF5BMl5BanBnXkFtZTcwMTE1Njg2MQ@@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-7",
+                "title": "Thor",
+                "year": 2011,
+                "timelineYear": "2011",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNjRhNGZjZjEtYTQzYS00OWUxLThjNGEtMTIwMTE2ZDFlZTZkXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-8",
+                "title": "Los Vengadores",
+                "year": 2012,
+                "timelineYear": "2012",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 1,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNGE0YTVjNzUtNzJjOS00NGNlLTgxMzctZTY4YTE1Y2Y1ZTU4XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-9",
+                "title": "Iron Man 3",
+                "year": 2013,
+                "timelineYear": "2012",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMjIzMzAzMjQyM15BMl5BanBnXkFtZTcwNzM2NjcyOQ@@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-10",
+                "title": "Thor: El Mundo Oscuro",
+                "year": 2013,
+                "timelineYear": "2013",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_QL75_UY562_CR7,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-shield",
+                "title": "Agentes de S.H.I.E.L.D.",
+                "year": 2013,
+                "timelineYear": "2013-2018",
+                "type": "series",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://static.tvmaze.com/uploads/images/medium_portrait/486/1215694.jpg"
+        },
+        {
+                "id": "mcu-11",
+                "title": "Capitán América: El Soldado de Invierno",
+                "year": 2014,
+                "timelineYear": "2014",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNWY1NjFmNDItZDhmOC00NjI1LWE0ZDItMTM0MjBjZThiOTQ2XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-daredevil",
+                "title": "Daredevil (Temporadas 1-3)",
+                "year": 2015,
+                "timelineYear": "2014-2018",
+                "type": "series",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://static.tvmaze.com/uploads/images/medium_portrait/171/429391.jpg"
+        },
+        {
+                "id": "mcu-12",
+                "title": "Guardianes de la Galaxia",
+                "year": 2014,
+                "timelineYear": "2014",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BM2ZmNjQ2MzAtNDlhNi00MmQyLWJhZDMtNmJiMjFlOWY4MzcxXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-13",
+                "title": "Guardianes de la Galaxia Vol. 2",
+                "year": 2017,
+                "timelineYear": "2014",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_QL75_UX380_CR0,1,380,562_.jpg"
+        },
+        {
+                "id": "mcu-14",
+                "title": "Yo soy Groot (Temporada 1 y 2)",
+                "year": 2022,
+                "timelineYear": "2014",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMzBlODMyZGQtN2QzOS00MDAzLWFjOGQtMGRjN2JmZWM0NWJkXkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-15",
+                "title": "Vengadores: La Era de Ultrón",
+                "year": 2015,
+                "timelineYear": "2015",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BODBhYTg1NGQtNGVmNS00ZTdiLThjYTYtZDFkNzRiNTZmNDZjXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-16",
+                "title": "Ant-Man",
+                "year": 2015,
+                "timelineYear": "2015",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 2,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMjM2NTQ5Mzc2M15BMl5BanBnXkFtZTgwNTcxMDI2NTE@._V1_QL75_UX380_CR0,1,380,562_.jpg"
+        },
+        {
+                "id": "mcu-17",
+                "title": "Capitán América: Civil War",
+                "year": 2016,
+                "timelineYear": "2016",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMjQ0MTgyNjAxMV5BMl5BanBnXkFtZTgwNjUzMDkyODE@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-18",
+                "title": "Viuda Negra",
+                "year": 2021,
+                "timelineYear": "2016",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZTMyZTA0ZTItYjY3Yi00ODNjLWExYTgtYzgxZTk0NTg0Y2FlXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-19",
+                "title": "Black Panther",
+                "year": 2018,
+                "timelineYear": "2016",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-20",
+                "title": "Spider-Man: Homecoming",
+                "year": 2017,
+                "timelineYear": "2016",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BODY2MTAzOTQ4M15BMl5BanBnXkFtZTgwNzg5MTE0MjI@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-21",
+                "title": "Doctor Strange",
+                "year": 2016,
+                "timelineYear": "2016-2017",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNjgwNzAzNjk1Nl5BMl5BanBnXkFtZTgwMzQ2NjI1OTE@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-22",
+                "title": "Thor: Ragnarok",
+                "year": 2017,
+                "timelineYear": "2017",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMjMyNDkzMzI1OF5BMl5BanBnXkFtZTgwODcxODg5MjI@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-23",
+                "title": "Ant-Man y la Avispa",
+                "year": 2018,
+                "timelineYear": "2018",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BODVkY2ZmZTAtYzFhMi00YzZlLWE2YWMtMDBiYjY2OTU4ZWM0XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-24",
+                "title": "Vengadores: Infinity War",
+                "year": 2018,
+                "timelineYear": "2018",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-25",
+                "title": "Vengadores: Endgame",
+                "year": 2019,
+                "timelineYear": "2018-2023",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMWEyNDM2ZmQtMmFkNi00MTQ1LTk1MjItMzdlZGJlYmIyYzZlXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-26",
+                "title": "Loki (Temporadas 1 y 2)",
+                "year": 2021,
+                "timelineYear": "Fuera del Tiempo",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYzA2YjM2ZWQtYTZhMS00OTI3LTlhYzQtZjBiZWZkMDdlNjA5XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-27",
+                "title": "¿Qué pasaría sí...? (What If...?)",
+                "year": 2021,
+                "timelineYear": "Multiverso",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYWFiOTcwNzItMTg5Mi00ZTU4LThkZWYtYWNmZWQ1ODE5ZTVmXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-28",
+                "title": "Bruja Escarlata y Visión (WandaVision)",
+                "year": 2021,
+                "timelineYear": "2023",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZTMxMmM1ODItMTZiMS00NjI1LWEwODctMjQ4ZjY4ODliNDI0XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+        },
+        {
+                "id": "mcu-29",
+                "title": "Falcon y el Soldado de Invierno",
+                "year": 2021,
+                "timelineYear": "2024",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYmJkOGNlNmEtMmQyOS00YjZiLTgxM2EtNmEzNzUzNTU5ODYwXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-30",
+                "title": "Spider-Man: Lejos de Casa",
+                "year": 2019,
+                "timelineYear": "2024",
+                "type": "movie",
+                "saga": "Infinity",
+                "phase": 3,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMzNhNTE0NWQtN2E1Ny00NjcwLTg1YTctMGY1NmMwODJmY2NmXkEyXkFqcGc@._V1_QL75_UX380_CR0,1,380,562_.jpg"
+        },
+        {
+                "id": "mcu-spiderman-1",
+                "title": "Spider-Man",
+                "year": 2002,
+                "timelineYear": "2002 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/6/6c/Spider-Man_%282002_film%29_poster.jpg"
+        },
+        {
+                "id": "mcu-spiderman-2",
+                "title": "Spider-Man 2",
+                "year": 2004,
+                "timelineYear": "2004 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/4/4e/Spider-Man_2_USA_poster.jpg"
+        },
+        {
+                "id": "mcu-spiderman-3",
+                "title": "Spider-Man 3",
+                "year": 2007,
+                "timelineYear": "2007 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/7/7a/Spider-Man_3%2C_International_Poster.jpg"
+        },
+        {
+                "id": "mcu-tasm-1",
+                "title": "The Amazing Spider-Man",
+                "year": 2012,
+                "timelineYear": "2012 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/e/e0/The_Amazing_Spider-Man_%28film%29_poster.jpg"
+        },
+        {
+                "id": "mcu-tasm-2",
+                "title": "The Amazing Spider-Man 2: El Poder de Electro",
+                "year": 2014,
+                "timelineYear": "2014 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/2/24/The_Amazing_Spider-Man_2_poster.jpg"
+        },
+        {
+                "id": "mcu-31",
+                "title": "Spider-Man: No Way Home",
+                "year": 2021,
+                "timelineYear": "2024",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMmFiZGZjMmEtMTA0Ni00MzA2LTljMTYtZGI2MGJmZWYzZTQ2XkEyXkFqcGc@._V1_QL75_UX380_CR0,4,380,562_.jpg"
+        },
+        {
+                "id": "mcu-32",
+                "title": "Shang-Chi y la Leyenda de los Diez Anillos",
+                "year": 2021,
+                "timelineYear": "2024",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZmY5MDcyNzAtYzg3MC00MGNlLTg3OGItNmRjYThkZGVlNzAyXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-33",
+                "title": "Eternals",
+                "year": 2021,
+                "timelineYear": "2024",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZTBiZjI2M2UtZTNiNy00NmU4LWJiMjYtZjk4MDIzMzhlMjFlXkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-34",
+                "title": "Doctor Strange en el Multiverso de la Locura",
+                "year": 2022,
+                "timelineYear": "2024",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BN2YxZGRjMzYtZjE1ZC00MDI0LThjZmQtZTZmMzVmMmQ2NzBmXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-35",
+                "title": "Ojo de Halcón (Hawkeye)",
+                "year": 2021,
+                "timelineYear": "Diciembre 2024",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BOGU5ZDBlOTAtOTZmYS00MWE0LTg0NzktNDcxZGJhN2FhZmM2XkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-36",
+                "title": "Caballero Luna (Moon Knight)",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNDAzNmYwZjgtNDc3YS00ZDMyLTk0MjktMTg4MGNmNGU3MjlhXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-37",
+                "title": "Ms. Marvel",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNzlkNjBmOWUtOTgzZS00OWIzLThkNWEtZTg5MGY2ODAyYzZjXkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-38",
+                "title": "Thor: Love and Thunder",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZjRiMDhiZjQtNjk5Yi00ZDcwLTkyYTEtMDc1NjdmNjFhNGIzXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-39",
+                "title": "She-Hulk: Abogada Hulka",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNjg4ZTQ1MjctNzEyMS00YWM2LTk1ZTQtNDU3ZDJjNjhhMDhkXkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-werewolf",
+                "title": "La Maldición del Hombre Lobo",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/0/06/Werewolf_by_Night_%28TV_special%29_poster.jpg"
+        },
+        {
+                "id": "mcu-40",
+                "title": "Black Panther: Wakanda Forever",
+                "year": 2022,
+                "timelineYear": "2025",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYWY5NDY1ZjItZDQxMy00MTAzLTgyOGQtNTQxYjFiMzZjMjUyXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-holiday-special",
+                "title": "Guardianes de la Galaxia: Especial Fiestas",
+                "year": 2022,
+                "timelineYear": "2025 (Navidad)",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 4,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/e/e3/The_Guardians_of_the_Galaxy_Holiday_Special_poster.jpg"
+        },
+        {
+                "id": "mcu-41",
+                "title": "Ant-Man y la Avispa: Quantumania",
+                "year": 2023,
+                "timelineYear": "2026",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMThkYWY5ZjQtYjJlMS00MDFmLWFkYzEtODEzZjg5YWFmMGY4XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-42",
+                "title": "Guardianes de la Galaxia Vol. 3",
+                "year": 2023,
+                "timelineYear": "2026",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BOTJhOTMxMmItZmE0Ny00MDc3LWEzOGEtOGFkMzY4MWYyZDQ0XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-43",
+                "title": "Invasión Secreta",
+                "year": 2023,
+                "timelineYear": "2026",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BNmYzYzA2NzMtOTVmMC00ZDY4LThlMDctZmUyN2NlMjQ2ODViXkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-44",
+                "title": "The Marvels",
+                "year": 2023,
+                "timelineYear": "2026",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYzczOWM4MzItMWMyOS00ZDczLWIxMzctNzBmYTgzOTI1MzI3XkEyXkFqcGc@._V1_SX300.jpg"
+        },
+        {
+                "id": "mcu-45",
+                "title": "Echo",
+                "year": 2024,
+                "timelineYear": "2026",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BYTJhNWRkZmUtYzQxMi00OTFiLThiNDgtOTRjNGM5MGIxMDIwXkEyXkFqcGc@._V1_QL75_UY562_CR9,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-deadpool-1",
+                "title": "Deadpool",
+                "year": 2016,
+                "timelineYear": "2016 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/2/23/Deadpool_%282016_poster%29.png"
+        },
+        {
+                "id": "mcu-deadpool-2",
+                "title": "Deadpool 2",
+                "year": 2018,
+                "timelineYear": "2018 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/c/cf/Deadpool_2_poster.jpg"
+        },
+        {
+                "id": "mcu-logan",
+                "title": "Logan",
+                "year": 2017,
+                "timelineYear": "2029 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://upload.wikimedia.org/wikipedia/en/3/37/Logan_2017_poster.jpg"
+        },
+        {
+                "id": "mcu-46",
+                "title": "Deadpool y Lobezno",
+                "year": 2024,
+                "timelineYear": "2026 / Multiverso",
+                "type": "movie",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BZTk5ODY0MmQtMzA3Ni00NGY1LThiYzItZThiNjFiNDM4MTM3XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg"
+        },
+        {
+                "id": "mcu-47",
+                "title": "Agatha, ¿quién si no?",
+                "year": 2024,
+                "timelineYear": "2026",
+                "type": "series",
+                "saga": "Multiverse",
+                "phase": 5,
+                "cover": "https://m.media-amazon.com/images/M/MV5BMDcyZTNjOTEtNzc5Yy00Y2UzLThkMWYtNTY4YmM4OWI5OTMzXkEyXkFqcGc@._V1_QL75_UY562_CR35,0,380,562_.jpg"
+        }
+];
+
+        let watchedItems = new Set(JSON.parse(localStorage.getItem('mcu_watched_items') || '[]'));
+        let currentFilter = 'all';
+        let currentType = 'all';
+        let currentSort = 'timeline';
+
+        const timelineContainer = document.getElementById('timeline-container');
+        const watchedCountEl = document.getElementById('watched-count');
+        const totalCountEl = document.getElementById('total-count');
+        const progressBarEl = document.getElementById('progress-bar');
+        const progressPercentEl = document.getElementById('progress-percent');
+        const filterButtonsContainer = document.getElementById('filter-buttons');
+        const btnReset = document.getElementById('btn-reset');
+        const btnSelectAll = document.getElementById('btn-select-all');
+
+        const filters = [
+            { id: 'all', label: 'Todas' },
+            { id: 'saga-Infinity', label: 'Saga del Infinito' },
+            { id: 'saga-Multiverse', label: 'Saga del Multiverso' },
+            { id: 'phase-1', label: 'Fase 1' },
+            { id: 'phase-2', label: 'Fase 2' },
+            { id: 'phase-3', label: 'Fase 3' },
+            { id: 'phase-4', label: 'Fase 4' },
+            { id: 'phase-5', label: 'Fase 5' }
+        ];
+
+        function renderFilters() {
+            filterButtonsContainer.innerHTML = filters.map(f => `
+                <button 
+                    onclick="setFilter('${f.id}')"
+                    class="px-3 py-1 rounded-full text-xs font-orbitron transition-all ${
+                        currentFilter === f.id 
+                        ? 'bg-tva-gold text-black font-bold shadow-[0_0_10px_rgba(255,183,3,0.5)]' 
+                        : 'bg-slate-900/80 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+                    }">
+                    ${f.label}
+                </button>
+            `).join('');
+        }
+
+        function setFilter(filterId) {
+            currentFilter = filterId;
+            renderFilters();
+            renderTimeline();
+        }
+
+        function setTypeFilter(type) {
+            currentType = type;
+            ['all', 'movie', 'series'].forEach(t => {
+                const btn = document.getElementById(`type-${t}`);
+                if (!btn) return;
+                if (t === type) {
+                    btn.className = 'px-2.5 py-1 text-xs font-orbitron rounded-md transition-all bg-tva-gold text-black font-semibold';
+                } else {
+                    btn.className = 'px-2.5 py-1 text-xs font-orbitron rounded-md transition-all text-slate-300 hover:text-white';
+                }
+            });
+            renderTimeline();
+        }
+
+        function toggleSort() {
+            currentSort = currentSort === 'timeline' ? 'release' : 'timeline';
+            document.getElementById('sort-label').textContent = currentSort === 'timeline' ? 'Orden: Cronológico' : 'Orden: Estreno';
+            renderTimeline();
+        }
+
+        function renderTimeline() {
+            timelineContainer.innerHTML = '';
+
+            let filteredData = mcuData.filter(item => {
+                let matchFilter = true;
+                if (currentFilter.startsWith('saga-')) matchFilter = (item.saga === currentFilter.replace('saga-', ''));
+                else if (currentFilter.startsWith('phase-')) matchFilter = (item.phase === parseInt(currentFilter.replace('phase-', '')));
+
+                let matchType = true;
+                if (currentType !== 'all') matchType = (item.type === currentType);
+
+                return matchFilter && matchType;
+            });
+
+            if (currentSort === 'release') {
+                filteredData = [...filteredData].sort((a, b) => a.year - b.year);
+            }
+
+            filteredData.forEach((item, index) => {
+                const isWatched = watchedItems.has(item.id);
+                const isEven = index % 2 === 0;
+
+                const cardHtml = `
+                    <div class="relative flex flex-col md:flex-row items-center ${isEven ? 'md:flex-row-reverse' : ''} group" id="row-${item.id}">
+                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-8 h-8 rounded-full border-2 ${isWatched ? 'border-tva-gold bg-tva-gold/20 shadow-[0_0_15px_#ffb703]' : 'border-cyan-400 bg-space-dark shadow-[0_0_10px_#4cc9f0]'} flex items-center justify-center z-30 transition-all">
+                            <i class="${isWatched ? 'fa-solid fa-check text-tva-gold' : 'fa-solid fa-timeline text-cyan-400'} text-xs"></i>
+                        </div>
+
+                        <div class="w-full md:w-[calc(50%-40px)] pl-16 md:pl-0">
+                            <div class="mcu-card ${isWatched ? 'watched' : ''} bg-space-card/85 p-4 sm:p-5 rounded-2xl relative overflow-hidden cursor-pointer" onclick="toggleWatched('${item.id}')">
+                                <div class="hidden md:block absolute top-1/2 ${isEven ? 'left-full' : 'right-full'} w-10 h-[2px] bg-gradient-to-r ${isEven ? 'from-cyan-500/80 to-transparent' : 'from-transparent to-cyan-500/80'}"></div>
+
+                                <div class="flex gap-4 items-center">
+                                    <div class="relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg overflow-hidden shrink-0 border border-white/10 bg-slate-900 shadow-md group/poster cursor-pointer" onclick="event.stopPropagation(); openDetailModal('${item.id}')" title="Clic para ver detalles y tráiler">
+                                        <img src="${item.cover}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover/poster:scale-105" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/200x300/0f172a/ffb703?text=' + encodeURIComponent('${item.title}')">
+                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/poster:opacity-100 flex items-center justify-center transition-opacity">
+                                            <i class="fa-solid fa-circle-info text-cyan-300 text-sm"></i>
+                                        </div>
+                                        <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-md text-[10px] font-orbitron text-cyan-300 border border-cyan-500/30">
+                                            ${item.type === 'movie' ? 'Película' : 'Serie'}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-orbitron text-tva-gold bg-tva-gold/10 px-2 py-0.5 rounded border border-tva-gold/30">
+                                                Año: ${item.timelineYear}
+                                            </span>
+                                            <span class="text-[11px] font-orbitron text-slate-400">Fase ${item.phase}</span>
+                                        </div>
+
+                                        <h3 class="card-title text-base sm:text-lg font-bold font-orbitron text-slate-100 group-hover:text-cyan-300 transition-colors truncate">
+                                            ${item.title}
+                                        </h3>
+
+                                        <p class="text-xs text-slate-400 mt-1 font-rajdhani">
+                                            Lanzamiento: ${item.year} | Saga: ${item.saga === 'Infinity' ? 'Infinito' : 'Multiverso'}
+                                        </p>
+
+                                        <div class="mt-3 flex items-center gap-2">
+                                            <div class="w-5 h-5 rounded border ${isWatched ? 'border-tva-gold bg-tva-gold shadow-[0_0_8px_#ffb703]' : 'border-slate-500 bg-slate-900'} flex items-center justify-center transition-all">
+                                                ${isWatched ? '<i class="fa-solid fa-check text-black text-xs font-bold"></i>' : ''}
+                                            </div>
+                                            <span class="text-xs font-orbitron ${isWatched ? 'text-tva-gold font-semibold' : 'text-slate-400'}">
+                                                ${isWatched ? 'Línea Asegurada' : 'Marcar como Visto'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                timelineContainer.innerHTML += cardHtml;
+            });
+
+            updateProgress();
+        }
+
+        function toggleWatched(id) {
+            if (watchedItems.has(id)) watchedItems.delete(id);
+            else watchedItems.add(id);
+            saveState();
+            renderTimeline();
+        }
+
+        function saveState() {
+            localStorage.setItem('mcu_watched_items', JSON.stringify(Array.from(watchedItems)));
+        }
+
+        function updateProgress() {
+            const total = mcuData.length;
+            const watched = watchedItems.size;
+            const percent = total > 0 ? Math.round((watched / total) * 100) : 0;
+
+            watchedCountEl.textContent = watched;
+            totalCountEl.textContent = total;
+            progressBarEl.style.width = `${percent}%`;
+            progressPercentEl.textContent = `${percent}%`;
+        }
+
+        function openDetailModal(id) {
+            const item = mcuData.find(i => i.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('modal-content');
+            const isWatched = watchedItems.has(item.id);
+
+            content.innerHTML = `
+                <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start text-left">
+                    <img src="${item.cover}" alt="${item.title}" class="w-28 h-40 object-cover rounded-xl border border-cyan-500/30 shadow-lg shrink-0">
+                    <div class="space-y-2 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-orbitron bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                                ${item.type === 'movie' ? 'Película' : 'Serie'}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-orbitron bg-tva-gold/10 text-tva-gold border border-tva-gold/30">
+                                Fase ${item.phase}
+                            </span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold font-orbitron text-white leading-snug">${item.title}</h3>
+                        <div class="text-xs text-slate-300 space-y-1 font-rajdhani">
+                            <p><strong class="text-slate-400">Año del Universo MCU:</strong> ${item.timelineYear}</p>
+                            <p><strong class="text-slate-400">Estreno Oficial:</strong> ${item.year}</p>
+                            <p><strong class="text-slate-400">Saga:</strong> ${item.saga === 'Infinity' ? 'Saga del Infinito' : 'Saga del Multiverso'}</p>
+                            <p><strong class="text-slate-400">Estado:</strong> <span class="${isWatched ? 'text-tva-gold' : 'text-slate-400'}">${isWatched ? 'Línea asegurada' : 'Pendiente'}</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-white/10 flex flex-wrap gap-2 justify-end">
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' trailer oficial marvel')}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-orbitron text-xs flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(239,68,68,0.4)]">
+                        <i class="fa-brands fa-youtube"></i> Ver Tráiler
+                    </a>
+                    <button onclick="toggleWatched('${item.id}'); openDetailModal('${item.id}');" class="px-3 py-2 rounded-lg border ${isWatched ? 'border-tva-gold text-tva-gold' : 'border-slate-600 text-slate-300 hover:bg-slate-800'} font-orbitron text-xs transition-all flex items-center gap-1.5">
+                        <i class="fa-solid ${isWatched ? 'fa-check' : 'fa-plus'}"></i> ${isWatched ? 'Asegurada' : 'Marcar Visto'}
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeDetailModal();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDetailModal();
+        });
+
+        function exportProgress() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Array.from(watchedItems)));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `mcu_progreso_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importProgress(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (Array.isArray(imported)) {
+                        watchedItems = new Set(imported);
+                        saveState();
+                        renderTimeline();
+                        alert(`Progreso importado con éxito: ${watchedItems.size} producciones cargadas.`);
+                    } else {
+                        alert('Formato de archivo inválido.');
+                    }
+                } catch (err) {
+                    alert('Error al leer el archivo JSON.');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        btnReset.addEventListener('click', () => {
+            if (confirm('¿Deseas reiniciar todo tu progreso de la línea temporal?')) {
+                watchedItems.clear();
+                saveState();
+                renderTimeline();
+            }
+        });
+
+        btnSelectAll.addEventListener('click', () => {
+            mcuData.forEach(item => watchedItems.add(item.id));
+            saveState();
+            renderTimeline();
+        });
+
+        /* ========================================================
+           CANVAS DE FONDO: SAGRADA LÍNEA DEL TIEMPO (TVA SACRED TIMELINE)
+           ======================================================== */
+        const spaceCanvas = document.getElementById('space-canvas');
+        const sCtx = spaceCanvas.getContext('2d');
+        let sw, sh, bgParticles = [], timelineStrands = [];
+
+        function initSpaceCanvas() {
+            sw = spaceCanvas.width = window.innerWidth;
+            sh = spaceCanvas.height = window.innerHeight;
+
+            bgParticles = [];
+            const count = Math.floor((sw * sh) / 12000);
+            for (let i = 0; i < count; i++) {
+                bgParticles.push({
+                    x: Math.random() * sw,
+                    y: Math.random() * sh,
+                    radius: Math.random() * 1.2 + 0.3,
+                    color: Math.random() > 0.4 ? '#4cc9f0' : (Math.random() > 0.5 ? '#ffb703' : '#7209b7'),
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.015 + 0.005
+                });
+            }
+
+            timelineStrands = [];
+            const colors = [
+                'rgba(76, 201, 240, 0.16)',
+                'rgba(255, 183, 3, 0.14)',
+                'rgba(114, 9, 183, 0.15)',
+                'rgba(251, 133, 0, 0.12)'
+            ];
+
+            for (let i = 0; i < 6; i++) {
+                timelineStrands.push({
+                    baseX: (sw / 7) * (i + 1),
+                    amplitude: Math.random() * 40 + 25,
+                    freq: Math.random() * 0.003 + 0.0015,
+                    speed: (Math.random() - 0.5) * 0.001,
+                    color: colors[i % colors.length],
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function animateSpaceCanvas() {
+            sCtx.clearRect(0, 0, sw, sh);
+
+            bgParticles.forEach(p => {
+                p.alpha += p.speed;
+                if (p.alpha > 1 || p.alpha < 0) p.speed = -p.speed;
+                sCtx.save();
+                sCtx.globalAlpha = Math.abs(p.alpha);
+                sCtx.fillStyle = p.color;
+                sCtx.beginPath();
+                sCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                sCtx.fill();
+                sCtx.restore();
+            });
+
+            const time = Date.now() * 0.001;
+
+            timelineStrands.forEach((s) => {
+                sCtx.save();
+                sCtx.strokeStyle = s.color;
+                sCtx.lineWidth = 1.8;
+                sCtx.beginPath();
+
+                for (let y = 0; y <= sh; y += 20) {
+                    const wave = Math.sin(y * s.freq + time * 0.6 + s.phase) * s.amplitude;
+                    const curX = s.baseX + wave;
+                    if (y === 0) sCtx.moveTo(curX, y);
+                    else sCtx.lineTo(curX, y);
+                }
+
+                sCtx.stroke();
+                sCtx.restore();
+            });
+
+            requestAnimationFrame(animateSpaceCanvas);
+        }
+
+        /* ========================================================
+           PORTAL SLING RING DOCTOR STRANGE (AUTÉNTICO)
+           ======================================================== */
+        const pCanvas = document.getElementById('strange-portal-canvas');
+        const pCtx = pCanvas ? pCanvas.getContext('2d') : null;
+        const portalWrap = document.getElementById('strange-portal-wrap');
+        const portalLogo = document.getElementById('portal-logo-trigger');
+
+        let isPortalHovered = false;
+        let portalSparks = [];
+        let slingAngle = 0;
+
+        function startPortal() { isPortalHovered = true; }
+        function stopPortal() { isPortalHovered = false; }
+
+        [portalWrap, portalLogo].forEach(el => {
+            if (el) {
+                el.addEventListener('mouseenter', startPortal);
+                el.addEventListener('mouseover', startPortal);
+                el.addEventListener('pointerenter', startPortal);
+                el.addEventListener('mouseleave', stopPortal);
+                el.addEventListener('mouseout', stopPortal);
+                el.addEventListener('pointerleave', stopPortal);
+                el.addEventListener('touchstart', startPortal, { passive: true });
+                el.addEventListener('touchend', stopPortal, { passive: true });
+            }
+        });
+
+        class SlingRingSpark {
+            constructor(cx, cy, r) {
+                this.angle = Math.random() * Math.PI * 2;
+                this.r = r + (Math.random() - 0.5) * 4;
+                this.x = cx + Math.cos(this.angle) * this.r;
+                this.y = cy + Math.sin(this.angle) * this.r;
+                this.prevX = this.x;
+                this.prevY = this.y;
+
+                const tangent = this.angle + Math.PI / 2;
+                const speed = Math.random() * 5.0 + 3.0;
+                const outward = Math.random() * 2.8 - 0.2;
+
+                this.vx = Math.cos(tangent) * speed + Math.cos(this.angle) * outward;
+                this.vy = Math.sin(tangent) * speed + Math.sin(this.angle) * outward;
+
+                this.life = 1.0;
+                this.decay = Math.random() * 0.045 + 0.022;
+                this.width = Math.random() * 2.4 + 1.2;
+
+                const palette = ['#ffffff', '#fff7a0', '#ffb703', '#fb8500', '#d00000'];
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+            }
+
+            update() {
+                this.prevX = this.x;
+                this.prevY = this.y;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.94;
+                this.vy *= 0.94;
+                this.vy += 0.05;
+                this.life -= this.decay;
+            }
+
+            draw(ctx) {
+                if (this.life <= 0) return;
+                ctx.save();
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.width * this.life;
+                ctx.lineCap = 'round';
+                ctx.shadowColor = '#ff9e00';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.moveTo(this.prevX, this.prevY);
+                ctx.lineTo(this.x, this.y);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function animateStrangePortal() {
+            if (!pCtx) return;
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+            if (!isPortalHovered && portalSparks.length === 0) {
+                requestAnimationFrame(animateStrangePortal);
+                return;
+            }
+
+            const cx = 110;
+            const cy = 110;
+            const radius = 26;
+
+            if (isPortalHovered) {
+                slingAngle += 0.35;
+                const count = 30;
+                for (let i = 0; i < count; i++) {
+                    portalSparks.push(new SlingRingSpark(cx, cy, radius));
+                }
+
+                pCtx.save();
+                pCtx.globalCompositeOperation = 'screen';
+                pCtx.lineWidth = 4.0;
+                pCtx.strokeStyle = 'rgba(255, 183, 3, 0.95)';
+                pCtx.shadowColor = '#fb8500';
+                pCtx.shadowBlur = 24;
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+                pCtx.stroke();
+
+                pCtx.lineWidth = 1.6;
+                pCtx.strokeStyle = 'rgba(255, 255, 255, 0.98)';
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+                pCtx.stroke();
+                pCtx.restore();
+            }
+
+            pCtx.save();
+            pCtx.globalCompositeOperation = 'lighter';
+            for (let i = portalSparks.length - 1; i >= 0; i--) {
+                const s = portalSparks[i];
+                s.update();
+                s.draw(pCtx);
+                if (s.life <= 0) portalSparks.splice(i, 1);
+            }
+            pCtx.restore();
+
+            requestAnimationFrame(animateStrangePortal);
+        }
+
+        window.addEventListener('resize', initSpaceCanvas);
+
+        window.onload = function() {
+            initSpaceCanvas();
+            animateSpaceCanvas();
+            animateStrangePortal();
+            renderFilters();
+            renderTimeline();
+        };
+    </script>
+</body>
+</html>
